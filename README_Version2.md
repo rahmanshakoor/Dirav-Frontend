@@ -1,10 +1,12 @@
-# 7x - Financial Empowerment for Students
+# Dirav - Financial Empowerment for Students (Version 2 Documentation)
 
 ## 1. Project Overview
 
-**7x** is a mobile application designed to empower students by providing them with tools for budgeting, financial planning, and accessing student-centric privileges. Born from an innovation bootcamp, 7x aims to foster financial literacy and help students manage their money effectively.
+**Dirav** is a mobile application designed to empower students by providing them with tools for budgeting, financial planning, and accessing student-centric privileges. Born from an innovation bootcamp where it earned third place and secured incubation, Dirav aims to foster financial literacy and help students manage their money effectively.
 
-This document outlines the technical specifications, development roadmap, and deployment strategy for the Minimum Viable Product (MVP) of the 7x application.
+This document outlines the technical specifications, development roadmap, and deployment strategy for the Minimum Viable Product (MVP) of the Dirav application.
+
+> **Note**: This is a legacy version of the documentation. Please refer to the main [README.md](README.md) for the most up-to-date and comprehensive documentation.
 
 ### 1.1. MVP Features
 
@@ -21,7 +23,7 @@ The core features for the MVP are:
 
 ## 2. Recommended Technology Stack
 
-This stack is chosen for its robustness, scalability, and performance, making it ideal for building and scaling the 7x application.
+This stack is chosen for its robustness, scalability, and performance, making it ideal for building and scaling the Dirav application.
 
 | Component      | Technology                                    | Justification                                                                                                                                                             |
 | -------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -70,7 +72,7 @@ The application will follow a microservices-oriented architecture to ensure scal
 
 #### Step 1: Setup Environment
 - Install Go and PostgreSQL.
-- Create a project directory and initialize a new Go module: `go mod init github.com/<your-repo>/7x-backend`.
+- Create a project directory and initialize a new Go module: `go mod init github.com/<your-repo>/dirav-backend`.
 - Install core dependencies:
   - `go get -u github.com/gin-gonic/gin` (for the web server)
   - `go get -u github.com/jackc/pgx/v5` (for PostgreSQL connectivity)
@@ -100,7 +102,7 @@ The application will follow a microservices-oriented architecture to ensure scal
 
 #### Step 1: Setup Environment
 - Set up your machine for React Native development (Node.js, Watchman, JDK, Android Studio/Xcode).
-- Create a new React Native project: `npx react-native init 7xApp`.
+- Create a new React Native project: `npx react-native init DiravApp`.
 
 #### Step 2: UI/UX Implementation
 - Create reusable UI components (Buttons, Inputs, Cards).
