@@ -4,10 +4,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Account struct {
-	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	ID          uuid.UUID `gorm:"type:uuid;primaryKey"`
 	UserID      uuid.UUID `gorm:"type:uuid;index;not null"`
 	AccountName string    `gorm:"not null"`
 	AccountType string    `gorm:"not null"`
@@ -16,4 +17,11 @@ type Account struct {
 	IsPrimary   bool      `gorm:"default:false"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+func (a *Account) BeforeCreate(tx *gorm.DB) (err error) {
+	if a.ID == uuid.Nil {
+		a.ID = uuid.New()
+	}
+	return
 }

@@ -5,6 +5,7 @@ import (
 
 	"dirav-backend/internal/config"
 	"dirav-backend/internal/models"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,7 +21,10 @@ func Connect(cfg config.Config) (*gorm.DB, error) {
 		cfg.DBSSLMode,
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

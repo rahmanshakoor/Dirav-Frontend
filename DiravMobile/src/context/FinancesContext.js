@@ -7,26 +7,16 @@ export const FinancesProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+
   // Financial state
-  const [balance, setBalance] = useState(2450.00);
-  const [savings, setSavings] = useState(1200.00);
-  const [monthlyAllowance, setMonthlyAllowance] = useState(3000);
-  
+  const [balance, setBalance] = useState(0);
+  const [savings, setSavings] = useState(0);
+  const [monthlyAllowance, setMonthlyAllowance] = useState(0);
+
   // Data from API
   const [accounts, setAccounts] = useState([]);
-  const [transactions, setTransactions] = useState([
-    { id: 1, title: 'Monthly Allowance', date: '2025-10-01', amount: 3000, type: 'income' },
-    { id: 2, title: 'Textbooks', date: '2025-10-03', amount: -150, type: 'expense' },
-    { id: 3, title: 'Coffee Shop', date: '2025-10-04', amount: -12.50, type: 'expense' },
-    { id: 4, title: 'Freelance Gig', date: '2025-10-05', amount: 200, type: 'income' },
-    { id: 5, title: 'Grocery Run', date: '2025-10-06', amount: -65.20, type: 'expense' },
-  ]);
-  const [savingsGoals, setSavingsGoals] = useState([
-    { id: 1, title: 'New Laptop', target: 2000, current: 850, color: '#3b82f6' },
-    { id: 2, title: 'Summer Trip', target: 1500, current: 350, color: '#ec4899' },
-    { id: 3, title: 'Emergency Fund', target: 1000, current: 1000, color: '#10b981', completed: true },
-  ]);
+  const [transactions, setTransactions] = useState([]);
+  const [savingsGoals, setSavingsGoals] = useState([]);
   const [budgets, setBudgets] = useState([]);
 
   // Authentication
@@ -49,10 +39,13 @@ export const FinancesProvider = ({ children }) => {
     setBudgets([]);
     setBalance(0);
     setSavings(0);
+    setMonthlyAllowance(0);
   };
 
   // Fetch all data from API
   const fetchAllData = useCallback(async () => {
+    if (!isAuthenticated) return;
+
     setIsLoading(true);
     setError(null);
     try {
@@ -65,7 +58,7 @@ export const FinancesProvider = ({ children }) => {
 
       if (accountsRes.status === 'fulfilled') {
         setAccounts(accountsRes.value.data);
-        // Calculate total balance from accounts
+        // Calculate total balance from all accounts
         const totalBalance = accountsRes.value.data.reduce((sum, acc) => sum + acc.balance, 0);
         setBalance(totalBalance);
       }
@@ -76,14 +69,14 @@ export const FinancesProvider = ({ children }) => {
 
       if (savingsRes.status === 'fulfilled') {
         setSavingsGoals(savingsRes.value.data);
-        // Calculate total savings
+        // Calculate total savings from current amounts of all goals
         const totalSavings = savingsRes.value.data.reduce((sum, goal) => sum + goal.current_amount, 0);
         setSavings(totalSavings);
       }
 
       if (budgetsRes.status === 'fulfilled') {
         setBudgets(budgetsRes.value.data);
-        // Get monthly budget as allowance
+        // Get active monthly budget as allowance
         const monthlyBudget = budgetsRes.value.data.find(b => b.period === 'monthly' && b.is_active);
         if (monthlyBudget) {
           setMonthlyAllowance(monthlyBudget.amount);
@@ -95,28 +88,27 @@ export const FinancesProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   // Transaction operations
   const addTransaction = async (transaction) => {
     try {
       setIsLoading(true);
-      // For demo mode (no backend), add locally
-      const newTransaction = { ...transaction, id: Date.now() };
-      setTransactions(prev => [newTransaction, ...prev]);
-      
+      const response = await transactionsAPI.create(transaction);
+      setTransactions(prev => [response.data, ...prev]);
+
+      // Update balance locally for immediate feedback
       if (transaction.type === 'income') {
         setBalance(curr => curr + Number(transaction.amount));
       } else {
         setBalance(curr => curr - Number(transaction.amount));
       }
 
-      // If connected to API:
-      // const response = await transactionsAPI.create(transaction);
-      // setTransactions(prev => [response.data, ...prev]);
-      // await fetchAllData(); // Refresh all data
+      // Refresh to ensure consistency
+      await fetchAllData();
     } catch (err) {
       setError(err.message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -125,18 +117,23 @@ export const FinancesProvider = ({ children }) => {
   const deleteTransaction = async (id) => {
     try {
       setIsLoading(true);
+      await transactionsAPI.delete(id);
+
       const transaction = transactions.find(t => t.id === id);
       if (transaction) {
         setTransactions(prev => prev.filter(t => t.id !== id));
+        // Revert balance change
         if (transaction.type === 'income') {
           setBalance(curr => curr - Number(Math.abs(transaction.amount)));
         } else {
           setBalance(curr => curr + Number(Math.abs(transaction.amount)));
         }
       }
-      // await transactionsAPI.delete(id);
+
+      await fetchAllData();
     } catch (err) {
       setError(err.message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -146,11 +143,12 @@ export const FinancesProvider = ({ children }) => {
   const addSavingsGoal = async (goal) => {
     try {
       setIsLoading(true);
-      const newGoal = { ...goal, id: Date.now(), current: 0, completed: false };
-      setSavingsGoals(prev => [...prev, newGoal]);
-      // const response = await savingsAPI.create(goal);
+      const response = await savingsAPI.create(goal);
+      setSavingsGoals(prev => [...prev, response.data]);
+      await fetchAllData();
     } catch (err) {
       setError(err.message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -159,21 +157,25 @@ export const FinancesProvider = ({ children }) => {
   const contributeToGoal = async (goalId, amount) => {
     try {
       setIsLoading(true);
+      await savingsAPI.contribute(goalId, amount);
+
       setSavingsGoals(prev => prev.map(goal => {
         if (goal.id === goalId) {
-          const newCurrent = goal.current + amount;
           return {
             ...goal,
-            current: newCurrent,
-            completed: newCurrent >= goal.target
+            current_amount: goal.current_amount + amount,
+            // Assuming backend handles is_completed logic, but updating locally for UI
+            // This is a simplification; ideally use backend response
           };
         }
         return goal;
       }));
       setSavings(prev => prev + amount);
-      // await savingsAPI.contribute(goalId, amount);
+
+      await fetchAllData();
     } catch (err) {
       setError(err.message);
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -192,11 +194,11 @@ export const FinancesProvider = ({ children }) => {
       transactions,
       savingsGoals,
       budgets,
-      
+
       // Auth actions
       login,
       logout,
-      
+
       // Data actions
       fetchAllData,
       addTransaction,
