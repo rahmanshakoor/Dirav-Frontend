@@ -42,7 +42,7 @@ const Planning = () => {
                     <h3 className="text-lg font-bold text-slate-800 mb-6">Monthly Allowance</h3>
 
                     <div className="flex items-end gap-2 mb-2">
-                        <span className="text-4xl font-bold text-indigo-600">${monthlyAllowance.toFixed(2)}</span>
+                        <span className="text-4xl font-bold text-blue-600">${monthlyAllowance.toFixed(2)}</span>
                         <span className="text-slate-400 mb-1">/ month</span>
                     </div>
 
@@ -53,7 +53,7 @@ const Planning = () => {
                         </div>
                         <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden">
                             <div
-                                className={`h-full rounded-full transition-all duration-500 ${progress > 90 ? 'bg-rose-500' : 'bg-indigo-500'}`}
+                                className={`h-full rounded-full transition-all duration-500 ${progress > 90 ? 'bg-rose-500' : 'bg-blue-500'}`}
                                 style={{ width: `${progress}%` }}
                             ></div>
                         </div>
@@ -72,7 +72,7 @@ const Planning = () => {
                             <input
                                 type="text"
                                 placeholder="e.g., Grocery, Freelance"
-                                className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-indigo-500 focus:outline-none"
+                                className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:outline-none"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                             />
@@ -82,7 +82,7 @@ const Planning = () => {
                             <input
                                 type="number"
                                 placeholder="0.00"
-                                className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-indigo-500 focus:outline-none"
+                                className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-blue-500 focus:outline-none"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
                             />

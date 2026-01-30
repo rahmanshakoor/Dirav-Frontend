@@ -32,7 +32,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             <aside className={`fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-200 flex flex-col z-40 transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}>
                 <div className="p-6 flex items-center justify-between border-b border-slate-100">
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
                         Dirav
                     </h1>
                     <button onClick={onClose} className="md:hidden text-slate-400 hover:text-slate-600">
@@ -48,7 +48,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                             onClick={() => onClose && onClose()}
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                    ? 'bg-indigo-50 text-indigo-600 font-medium shadow-sm'
+                                    ? 'bg-blue-50 text-blue-600 font-medium shadow-sm'
                                     : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
                                 }`
                             }

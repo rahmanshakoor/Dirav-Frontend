@@ -8,7 +8,7 @@ const Dashboard = () => {
     const [activePromo, setActivePromo] = useState(0);
 
     const featuredPromos = [
-        { id: 1, title: 'Back to School Tech', discount: '40% OFF', provider: 'ElectroWorld', color: 'from-violet-600 to-indigo-600', icon: Tag },
+        { id: 1, title: 'Back to School Tech', discount: '40% OFF', provider: 'ElectroWorld', color: 'from-blue-600 to-blue-700', icon: Tag },
         { id: 2, title: 'Summer Travel Pass', discount: '$200 Grant', provider: 'GlobalRail', color: 'from-pink-500 to-rose-500', icon: Sparkles },
         { id: 3, title: 'Campus Meal Plan', discount: 'Buy 1 Get 1', provider: 'UniFoods', color: 'from-cyan-500 to-teal-500', icon: Tag },
     ];
@@ -17,12 +17,12 @@ const Dashboard = () => {
         <div className="space-y-8 pb-20 md:pb-0">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-700 to-indigo-500 bg-clip-text text-transparent">
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
                         Welcome back, Student
                     </h2>
                     <p className="text-slate-500 mt-1">Here's your financial pulse.</p>
                 </div>
-                <Link to="/opportunities" className="hidden md:flex text-indigo-600 font-medium hover:underline">
+                <Link to="/opportunities" className="hidden md:flex text-blue-600 font-medium hover:underline">
                     View all opportunities &rarr;
                 </Link>
             </div>
@@ -68,7 +68,7 @@ const Dashboard = () => {
             </div>
 
             <div className="md:hidden text-center">
-                <Link to="/opportunities" className="text-indigo-600 font-medium hover:underline">
+                <Link to="/opportunities" className="text-blue-600 font-medium hover:underline">
                     See all 15+ student discounts &rarr;
                 </Link>
             </div>
@@ -83,7 +83,7 @@ const Dashboard = () => {
                             <p className="text-slate-500 font-medium text-sm">Total Balance</p>
                             <h3 className="text-3xl font-bold mt-1 text-slate-900">${balance.toFixed(2)}</h3>
                         </div>
-                        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                        <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
                             <Wallet size={24} />
                         </div>
                     </div>
@@ -144,7 +144,7 @@ const Dashboard = () => {
                 <div className="lg:col-span-2 space-y-4">
                     <div className="flex items-center justify-between">
                         <h3 className="text-xl font-bold text-slate-800">Recent Transactions</h3>
-                        <button className="text-sm text-indigo-600 font-medium hover:text-indigo-700">View All</button>
+                        <button className="text-sm text-blue-600 font-medium hover:text-blue-700">View All</button>
                     </div>
 
                     <div className="card p-0 overflow-hidden">
@@ -178,7 +178,7 @@ const Dashboard = () => {
                                 "Spending on coffee has increased by 15%. Consider the Campus Cafe discount (Buy 1 Get 1)!"
                             </p>
                             <div className="flex gap-2">
-                                <button className="px-4 py-2 bg-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-500 transition-colors flex-1">
+                                <button className="px-4 py-2 bg-blue-600 rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors flex-1">
                                     View Tip
                                 </button>
                                 <button className="px-4 py-2 bg-slate-700 rounded-lg text-sm font-medium hover:bg-slate-600 transition-colors">

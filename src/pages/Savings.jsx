@@ -23,7 +23,7 @@ const Savings = () => {
             title: newGoalTitle,
             target: Number(newGoalTarget),
             current: 0,
-            color: 'bg-indigo-500'
+            color: 'bg-blue-500'
         }]);
         setIsAdding(false);
         setNewGoalTitle('');
@@ -81,7 +81,7 @@ const Savings = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {goals.map(goal => (
-                    <div key={goal.id} className={`card border-l-4 ${goal.completed ? 'border-emerald-500' : 'border-indigo-500'}`}>
+                    <div key={goal.id} className={`card border-l-4 ${goal.completed ? 'border-emerald-500' : 'border-blue-500'}`}>
                         <div className="flex justify-between mb-4">
                             <div className="font-bold text-lg text-slate-800">{goal.title}</div>
                             {goal.completed && <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-bold">Completed</span>}
