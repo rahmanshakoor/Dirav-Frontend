@@ -13,9 +13,8 @@ import {
   DashboardScreen,
   PlanningScreen,
   SavingsScreen,
-  OpportunitiesScreen,
   AIAdvisorScreen,
-  BlogsScreen,
+  ProfileScreen,
   LoginScreen,
   RegisterScreen,
 } from './src/screens';
@@ -60,14 +59,11 @@ function MainTabs() {
             case 'Savings':
               iconName = focused ? 'cash' : 'cash-outline';
               break;
-            case 'Opportunities':
+            case 'AI Advisor':
               iconName = focused ? 'sparkles' : 'sparkles-outline';
               break;
-            case 'AI Advisor':
-              iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
-              break;
-            case 'Blogs':
-              iconName = focused ? 'book' : 'book-outline';
+            case 'Profile':
+              iconName = focused ? 'person' : 'person-outline';
               break;
             default:
               iconName = 'help-circle-outline';
@@ -106,7 +102,6 @@ function MainTabs() {
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Planning" component={PlanningScreen} />
       <Tab.Screen name="Savings" component={SavingsScreen} />
-      <Tab.Screen name="Opportunities" component={OpportunitiesScreen} />
       <Tab.Screen
         name="AI Advisor"
         component={AIAdvisorScreen}
@@ -114,7 +109,7 @@ function MainTabs() {
           tabBarLabel: 'AI',
         }}
       />
-      <Tab.Screen name="Blogs" component={BlogsScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }

@@ -8,40 +8,97 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFinances } from '../context/FinancesContext';
 import colors from '../constants/colors';
 
 const AIAdvisorScreen = () => {
-  const [messages, setMessages] = useState([
-    { 
-      id: 1, 
-      sender: 'bot', 
-      text: 'Hello! I am your personal financial advisor. I notice you spent 15% more on food this week. Would you like some tips on budgeting for meals?' 
-    }
-  ]);
+  const { user, balance, savings, transactions } = useFinances();
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const flatListRef = useRef(null);
+
+  // Initialize with a personalized welcome message
+  useEffect(() => {
+    const userName = user?.first_name || 'there';
+    const hasTransactions = transactions.length > 0;
+    
+    let welcomeMessage = `Hello ${userName}! 👋 I'm your personal financial advisor. `;
+    
+    if (hasTransactions) {
+      welcomeMessage += `I can see you have ${transactions.length} transaction${transactions.length > 1 ? 's' : ''} recorded. `;
+    }
+    
+    welcomeMessage += `Feel free to ask me anything about budgeting, saving, or managing your finances!`;
+    
+    setMessages([{
+      id: 1,
+      sender: 'bot',
+      text: welcomeMessage
+    }]);
+  }, [user, transactions.length]);
 
   const handleSend = () => {
     if (!input.trim()) return;
 
     const userMessage = { id: Date.now(), sender: 'user', text: input };
     setMessages(prev => [...prev, userMessage]);
+    const userInput = input;
     setInput('');
+    setIsLoading(true);
 
-    // Mock AI response
+    // Generate contextual response based on user's financial data
     setTimeout(() => {
+      const response = generateResponse(userInput);
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         sender: 'bot',
-        text: "That's a great goal. Based on your current allowance, I suggest setting aside $50/week. I can help you set up an auto-save rule if you'd like!"
+        text: response
       }]);
+      setIsLoading(false);
     }, 1000);
   };
 
+  const generateResponse = (userInput) => {
+    const lowercaseInput = userInput.toLowerCase();
+    
+    // Budget/spending related
+    if (lowercaseInput.includes('budget') || lowercaseInput.includes('spend')) {
+      const totalExpenses = transactions
+        .filter(t => t.type === 'expense')
+        .reduce((acc, t) => acc + Math.abs(t.amount), 0);
+      return `Based on your records, you've spent $${totalExpenses.toFixed(2)} in total expenses. A good budgeting practice is the 50/30/20 rule: 50% for needs, 30% for wants, and 20% for savings. Would you like me to help you create a budget plan?`;
+    }
+    
+    // Savings related
+    if (lowercaseInput.includes('save') || lowercaseInput.includes('saving')) {
+      return `You currently have $${savings.toFixed(2)} in savings. Great job! A good target is to have 3-6 months of expenses saved as an emergency fund. Consider setting up automatic transfers to your savings account on payday to make saving effortless.`;
+    }
+    
+    // Balance related
+    if (lowercaseInput.includes('balance') || lowercaseInput.includes('money')) {
+      return `Your current balance is $${balance.toFixed(2)}. To maintain a healthy balance, try to keep at least one month's worth of expenses as a buffer. This helps you avoid overdrafts and gives you flexibility for unexpected costs.`;
+    }
+    
+    // Goals related
+    if (lowercaseInput.includes('goal')) {
+      return `Setting financial goals is a great step! Start with SMART goals: Specific, Measurable, Achievable, Relevant, and Time-bound. For example, "Save $500 for an emergency fund in 3 months" is better than "save more money." Would you like to set up a new savings goal?`;
+    }
+    
+    // Investment related
+    if (lowercaseInput.includes('invest')) {
+      return `Before investing, make sure you have: 1) An emergency fund (3-6 months expenses), 2) No high-interest debt. For beginners, consider starting with index funds or ETFs which offer diversification at low cost. Remember, investing involves risk - only invest what you can afford to lose.`;
+    }
+    
+    // Default helpful response
+    return `That's a great question! Here are some general tips I can help you with:\n\n• Track all your expenses\n• Set realistic savings goals\n• Review your budget monthly\n• Build an emergency fund\n\nWould you like me to elaborate on any of these topics?`;
+  };
+
   useEffect(() => {
-    if (flatListRef.current) {
+    if (flatListRef.current && messages.length > 0) {
       flatListRef.current.scrollToEnd({ animated: true });
     }
   }, [messages]);
@@ -91,13 +148,19 @@ const AIAdvisorScreen = () => {
           contentContainerStyle={styles.messagesList}
           showsVerticalScrollIndicator={false}
           onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+          ListFooterComponent={isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={styles.loadingText}>Thinking...</Text>
+            </View>
+          ) : null}
         />
 
         {/* Input Area */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Ask me anything about money..."
+            placeholder="Ask about budgeting, saving, investing..."
             placeholderTextColor={colors.textLight}
             value={input}
             onChangeText={setInput}
@@ -105,9 +168,9 @@ const AIAdvisorScreen = () => {
             maxLength={500}
           />
           <TouchableOpacity 
-            style={[styles.sendButton, !input.trim() && styles.sendButtonDisabled]} 
+            style={[styles.sendButton, (!input.trim() || isLoading) && styles.sendButtonDisabled]} 
             onPress={handleSend}
-            disabled={!input.trim()}
+            disabled={!input.trim() || isLoading}
           >
             <Ionicons name="send" size={18} color={colors.white} />
           </TouchableOpacity>
@@ -239,6 +302,18 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     backgroundColor: colors.textLight,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: colors.textMuted,
   },
 });
 

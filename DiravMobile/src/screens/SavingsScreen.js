@@ -87,54 +87,65 @@ const SavingsScreen = () => {
 
         {/* Goals Grid */}
         <View style={styles.goalsGrid}>
-          {savingsGoals.map((goal) => {
-            const progress = Math.min((goal.current / goal.target) * 100, 100);
-            return (
-              <View 
-                key={goal.id} 
-                style={[
-                  styles.goalCard,
-                  { borderLeftColor: goal.completed ? colors.success : colors.primary }
-                ]}
-              >
-                <View style={styles.goalHeader}>
-                  <Text style={styles.goalTitle}>{goal.title}</Text>
-                  {goal.completed && (
-                    <View style={styles.completedBadge}>
-                      <Text style={styles.completedBadgeText}>Completed</Text>
+          {savingsGoals.length > 0 ? (
+            savingsGoals.map((goal) => {
+              const currentAmount = goal.current || goal.current_amount || 0;
+              const targetAmount = goal.target || goal.target_amount || 0;
+              const progress = targetAmount > 0 ? Math.min((currentAmount / targetAmount) * 100, 100) : 0;
+              const isCompleted = goal.completed || goal.is_completed || progress >= 100;
+              return (
+                <View 
+                  key={goal.id} 
+                  style={[
+                    styles.goalCard,
+                    { borderLeftColor: isCompleted ? colors.success : colors.primary }
+                  ]}
+                >
+                  <View style={styles.goalHeader}>
+                    <Text style={styles.goalTitle}>{goal.title || goal.name}</Text>
+                    {isCompleted && (
+                      <View style={styles.completedBadge}>
+                        <Text style={styles.completedBadgeText}>Completed</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <View style={styles.goalProgress}>
+                    <View style={styles.goalProgressLabels}>
+                      <Text style={styles.goalSaved}>${currentAmount.toFixed(2)} saved</Text>
+                      <Text style={styles.goalTarget}>Target: ${targetAmount.toFixed(2)}</Text>
                     </View>
+                    <View style={styles.progressBar}>
+                      <View 
+                        style={[
+                          styles.progressFill, 
+                          { 
+                            width: `${progress}%`,
+                            backgroundColor: goal.color || colors.primary 
+                          }
+                        ]} 
+                      />
+                    </View>
+                  </View>
+
+                  {!isCompleted && (
+                    <TouchableOpacity 
+                      style={styles.goalButton}
+                      onPress={() => handleContribute(goal.id, goal.title || goal.name)}
+                    >
+                      <Text style={styles.goalButtonText}>Add Money</Text>
+                    </TouchableOpacity>
                   )}
                 </View>
-
-                <View style={styles.goalProgress}>
-                  <View style={styles.goalProgressLabels}>
-                    <Text style={styles.goalSaved}>${goal.current} saved</Text>
-                    <Text style={styles.goalTarget}>Target: ${goal.target}</Text>
-                  </View>
-                  <View style={styles.progressBar}>
-                    <View 
-                      style={[
-                        styles.progressFill, 
-                        { 
-                          width: `${progress}%`,
-                          backgroundColor: goal.color || colors.primary 
-                        }
-                      ]} 
-                    />
-                  </View>
-                </View>
-
-                {!goal.completed && (
-                  <TouchableOpacity 
-                    style={styles.goalButton}
-                    onPress={() => handleContribute(goal.id, goal.title)}
-                  >
-                    <Text style={styles.goalButtonText}>Add Money</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            );
-          })}
+              );
+            })
+          ) : (
+            <View style={styles.emptyCard}>
+              <Ionicons name="flag-outline" size={48} color={colors.textLight} />
+              <Text style={styles.emptyText}>No savings goals yet</Text>
+              <Text style={styles.emptySubtext}>Create your first savings goal to start saving</Text>
+            </View>
+          )}
         </View>
 
         <View style={{ height: 100 }} />
@@ -371,6 +382,26 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 16,
     fontWeight: '600',
+  },
+  emptyCard: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 32,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textMain,
+    marginTop: 16,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: colors.textMuted,
+    marginTop: 4,
+    textAlign: 'center',
   },
 });
 

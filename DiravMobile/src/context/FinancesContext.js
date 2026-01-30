@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useCallback } from 'react';
-import { transactionsAPI, accountsAPI, savingsAPI, budgetsAPI, setAuthToken } from '../services/api';
+import { transactionsAPI, accountsAPI, savingsAPI, budgetsAPI, userAPI, setAuthToken } from '../services/api';
 
 const FinancesContext = createContext();
 
@@ -7,6 +7,9 @@ export const FinancesProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // User profile
+  const [user, setUser] = useState(null);
 
   // Financial state
   const [balance, setBalance] = useState(0);
@@ -23,6 +26,7 @@ export const FinancesProvider = ({ children }) => {
   const login = async (token) => {
     setAuthToken(token);
     setIsAuthenticated(true);
+    await fetchUserProfile();
     await fetchAllData();
   };
 
@@ -33,6 +37,7 @@ export const FinancesProvider = ({ children }) => {
   };
 
   const resetState = () => {
+    setUser(null);
     setAccounts([]);
     setTransactions([]);
     setSavingsGoals([]);
@@ -40,6 +45,16 @@ export const FinancesProvider = ({ children }) => {
     setBalance(0);
     setSavings(0);
     setMonthlyAllowance(0);
+  };
+
+  // Fetch user profile
+  const fetchUserProfile = async () => {
+    try {
+      const response = await userAPI.getProfile();
+      setUser(response.data);
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+    }
   };
 
   // Fetch all data from API
@@ -187,6 +202,7 @@ export const FinancesProvider = ({ children }) => {
       isLoading,
       error,
       isAuthenticated,
+      user,
       balance,
       savings,
       monthlyAllowance,

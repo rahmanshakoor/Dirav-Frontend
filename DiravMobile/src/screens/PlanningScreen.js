@@ -159,32 +159,40 @@ const PlanningScreen = () => {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Recent Transactions</Text>
         
-        {transactions.slice(0, 10).map((item, index) => {
-          const isIncome = item.type === 'income';
-          return (
-            <View key={item.id}>
-              <View style={styles.transactionItem}>
-                <View style={styles.transactionLeft}>
-                  <View style={[styles.transactionIcon, { backgroundColor: isIncome ? colors.successLight : colors.errorLight }]}>
-                    <Ionicons
-                      name={isIncome ? 'arrow-down' : 'arrow-up'}
-                      size={16}
-                      color={isIncome ? colors.success : colors.error}
-                    />
+        {transactions.length > 0 ? (
+          transactions.slice(0, 10).map((item, index) => {
+            const isIncome = item.type === 'income';
+            return (
+              <View key={item.id}>
+                <View style={styles.transactionItem}>
+                  <View style={styles.transactionLeft}>
+                    <View style={[styles.transactionIcon, { backgroundColor: isIncome ? colors.successLight : colors.errorLight }]}>
+                      <Ionicons
+                        name={isIncome ? 'arrow-down' : 'arrow-up'}
+                        size={16}
+                        color={isIncome ? colors.success : colors.error}
+                      />
+                    </View>
+                    <View>
+                      <Text style={styles.transactionTitle}>{item.title || item.description || 'Transaction'}</Text>
+                      <Text style={styles.transactionDate}>{item.date}</Text>
+                    </View>
                   </View>
-                  <View>
-                    <Text style={styles.transactionTitle}>{item.title}</Text>
-                    <Text style={styles.transactionDate}>{item.date}</Text>
-                  </View>
+                  <Text style={[styles.transactionAmount, { color: isIncome ? colors.success : colors.textMain }]}>
+                    {isIncome ? '+' : '-'}${Math.abs(item.amount).toFixed(2)}
+                  </Text>
                 </View>
-                <Text style={[styles.transactionAmount, { color: isIncome ? colors.success : colors.textMain }]}>
-                  {isIncome ? '+' : '-'}${Math.abs(item.amount).toFixed(2)}
-                </Text>
+                {index < transactions.slice(0, 10).length - 1 && <View style={styles.divider} />}
               </View>
-              {index < transactions.slice(0, 10).length - 1 && <View style={styles.divider} />}
-            </View>
-          );
-        })}
+            );
+          })
+        ) : (
+          <View style={styles.emptyState}>
+            <Ionicons name="receipt-outline" size={40} color={colors.textLight} />
+            <Text style={styles.emptyText}>No transactions yet</Text>
+            <Text style={styles.emptySubtext}>Add your first transaction above</Text>
+          </View>
+        )}
       </View>
 
       <View style={{ height: 100 }} />
@@ -369,6 +377,21 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: colors.borderLight,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 24,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textMain,
+    marginTop: 12,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: colors.textMuted,
+    marginTop: 4,
   },
 });
 
