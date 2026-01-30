@@ -12,7 +12,7 @@ const Layout = () => {
 
             {/* Mobile Header */}
             <div className="md:hidden fixed top-0 w-full bg-white border-b border-slate-200 p-4 z-20 flex justify-between items-center">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
                     Dirav
                 </h1>
                 <button

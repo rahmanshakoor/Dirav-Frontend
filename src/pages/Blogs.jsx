@@ -60,17 +60,17 @@ const Blogs = () => {
                             />
                         </div>
                         <div className="p-8 md:p-12 flex flex-col justify-center">
-                            <div className="flex items-center gap-3 text-sm text-indigo-600 font-medium mb-4">
-                                <span className="bg-indigo-50 px-3 py-1 rounded-full">{article.category}</span>
+                            <div className="flex items-center gap-3 text-sm text-blue-600 font-medium mb-4">
+                                <span className="bg-blue-50 px-3 py-1 rounded-full">{article.category}</span>
                                 <span className="flex items-center gap-1 text-slate-400"><Clock size={16} /> {article.readTime}</span>
                             </div>
-                            <h3 className="text-2xl md:text-3xl font-bold text-slate-800 mb-4 group-hover:text-indigo-600 transition-colors">
+                            <h3 className="text-2xl md:text-3xl font-bold text-slate-800 mb-4 group-hover:text-blue-600 transition-colors">
                                 {article.title}
                             </h3>
                             <p className="text-slate-500 mb-6 leading-relaxed">
                                 {article.excerpt}
                             </p>
-                            <div className="flex items-center text-indigo-600 font-semibold group-hover:translate-x-1 transition-transform">
+                            <div className="flex items-center text-blue-600 font-semibold group-hover:translate-x-1 transition-transform">
                                 Read Article <ArrowRight size={20} className="ml-2" />
                             </div>
                         </div>
@@ -90,11 +90,11 @@ const Blogs = () => {
                             />
                         </div>
                         <div className="p-6">
-                            <div className="flex items-center gap-3 text-xs text-indigo-600 font-medium mb-3">
-                                <span className="bg-indigo-50 px-2 py-1 rounded-md">{article.category}</span>
+                            <div className="flex items-center gap-3 text-xs text-blue-600 font-medium mb-3">
+                                <span className="bg-blue-50 px-2 py-1 rounded-md">{article.category}</span>
                                 <span className="text-slate-400">{article.readTime}</span>
                             </div>
-                            <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-indigo-600 transition-colors">
+                            <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-blue-600 transition-colors">
                                 {article.title}
                             </h3>
                             <p className="text-slate-500 text-sm line-clamp-3">

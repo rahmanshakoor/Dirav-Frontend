@@ -28,7 +28,7 @@ const AIAdvisor = () => {
         <div className="h-[calc(100vh-8rem)] flex flex-col">
             <div className="mb-6">
                 <h2 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
-                    AI Advisor <Sparkles className="text-indigo-500" />
+                    AI Advisor <Sparkles className="text-blue-500" />
                 </h2>
                 <p className="text-slate-500 mt-1">Get personalized financial advice powered by AI.</p>
             </div>
@@ -38,13 +38,13 @@ const AIAdvisor = () => {
                 <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50">
                     {messages.map(msg => (
                         <div key={msg.id} className={`flex gap-4 ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${msg.sender === 'bot' ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600'
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${msg.sender === 'bot' ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
                                 }`}>
                                 {msg.sender === 'bot' ? <Bot size={20} /> : <User size={20} />}
                             </div>
                             <div className={`max-w-[80%] rounded-2xl p-4 ${msg.sender === 'bot'
                                     ? 'bg-white text-slate-800 shadow-sm border border-slate-100 rounded-tl-none'
-                                    : 'bg-indigo-600 text-white rounded-tr-none'
+                                    : 'bg-blue-600 text-white rounded-tr-none'
                                 }`}>
                                 <p className="leading-relaxed">{msg.text}</p>
                             </div>
@@ -58,13 +58,13 @@ const AIAdvisor = () => {
                         <input
                             type="text"
                             placeholder="Ask me anything about money..."
-                            className="w-full pl-6 pr-14 py-4 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                            className="w-full pl-6 pr-14 py-4 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                         />
                         <button
                             type="submit"
-                            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                         >
                             <Send size={18} />
                         </button>
