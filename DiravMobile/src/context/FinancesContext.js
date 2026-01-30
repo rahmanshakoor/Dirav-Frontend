@@ -156,7 +156,7 @@ export const FinancesProvider = ({ children }) => {
     }
   };
 
-  const contributeTGoal = async (goalId, amount) => {
+  const contributeToGoal = async (goalId, amount) => {
     try {
       setIsLoading(true);
       setSavingsGoals(prev => prev.map(goal => {
@@ -202,7 +202,7 @@ export const FinancesProvider = ({ children }) => {
       addTransaction,
       deleteTransaction,
       addSavingsGoal,
-      contributeTGoal,
+      contributeToGoal,
     }}>
       {children}
     </FinancesContext.Provider>

@@ -14,7 +14,7 @@ import { useFinances } from '../context/FinancesContext';
 import colors from '../constants/colors';
 
 const SavingsScreen = () => {
-  const { savings, savingsGoals, addSavingsGoal, contributeTGoal } = useFinances();
+  const { savings, savingsGoals, addSavingsGoal, contributeToGoal } = useFinances();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newGoalTitle, setNewGoalTitle] = useState('');
   const [newGoalTarget, setNewGoalTarget] = useState('');
@@ -47,7 +47,7 @@ const SavingsScreen = () => {
           text: 'Add',
           onPress: (amount) => {
             if (amount && !isNaN(amount)) {
-              contributeTGoal(goalId, Number(amount));
+              contributeToGoal(goalId, Number(amount));
               Alert.alert('Success', `$${amount} added to ${goalTitle}!`);
             }
           },
