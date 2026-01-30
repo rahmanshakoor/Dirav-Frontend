@@ -10,6 +10,7 @@ import {
     ActivityIndicator,
     Alert,
     ScrollView,
+    Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -67,9 +68,11 @@ const RegisterScreen = ({ navigation }) => {
                         >
                             <Ionicons name="arrow-back" size={24} color={colors.textMain} />
                         </TouchableOpacity>
-                        <View style={styles.logoContainer}>
-                            <Ionicons name="wallet" size={32} color={colors.white} />
-                        </View>
+                        <Image
+                            source={require('../../../assets/brand-icon.png')}
+                            style={styles.logoImage}
+                            resizeMode="contain"
+                        />
                         <Text style={styles.appName}>Join Dirav</Text>
                         <Text style={styles.tagline}>Start your financial journey</Text>
                     </View>
@@ -179,19 +182,10 @@ const styles = StyleSheet.create({
         top: 0,
         padding: 8,
     },
-    logoContainer: {
+    logoImage: {
         width: 64,
         height: 64,
-        borderRadius: 20,
-        backgroundColor: colors.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
         marginBottom: 16,
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.3,
-        shadowRadius: 16,
-        elevation: 8,
     },
     appName: {
         fontSize: 28,
