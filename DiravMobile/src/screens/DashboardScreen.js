@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -11,14 +11,24 @@ import { useFinances } from '../context/FinancesContext';
 import colors from '../constants/colors';
 
 const DashboardScreen = ({ navigation }) => {
-  const { balance, savings, monthlyAllowance, transactions } = useFinances();
-  const [activePromo, setActivePromo] = useState(0);
+  const { balance, savings, monthlyAllowance, transactions, savingsGoals, user } = useFinances();
 
-  const featuredPromos = [
-    { id: 1, title: 'Back to School Tech', discount: '40% OFF', provider: 'ElectroWorld', color: colors.primary },
-    { id: 2, title: 'Summer Travel Pass', discount: '$200 Grant', provider: 'GlobalRail', color: '#ec4899' },
-    { id: 3, title: 'Campus Meal Plan', discount: 'Buy 1 Get 1', provider: 'UniFoods', color: colors.secondary },
-  ];
+  // Calculate actual spending this month
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const monthlyTransactions = transactions.filter(t => 
+    t.date && t.date.startsWith(currentMonth)
+  );
+  
+  const totalSpentThisMonth = monthlyTransactions
+    .filter(t => t.type === 'expense')
+    .reduce((acc, curr) => acc + Math.abs(curr.amount), 0);
+    
+  const remainingAllowance = monthlyAllowance - totalSpentThisMonth;
+
+  // Calculate savings goal progress
+  const totalSavingsTarget = savingsGoals.reduce((acc, goal) => acc + (goal.target || goal.target_amount || 0), 0);
+  const totalSavingsCurrent = savingsGoals.reduce((acc, goal) => acc + (goal.current || goal.current_amount || 0), 0);
+  const savingsProgress = totalSavingsTarget > 0 ? Math.round((totalSavingsCurrent / totalSavingsTarget) * 100) : 0;
 
   const renderTransaction = ({ item }) => {
     const isIncome = item.type === 'income';
@@ -33,7 +43,7 @@ const DashboardScreen = ({ navigation }) => {
             />
           </View>
           <View>
-            <Text style={styles.transactionTitle}>{item.title}</Text>
+            <Text style={styles.transactionTitle}>{item.title || item.description || 'Transaction'}</Text>
             <Text style={styles.transactionDate}>{item.date}</Text>
           </View>
         </View>
@@ -44,49 +54,17 @@ const DashboardScreen = ({ navigation }) => {
     );
   };
 
+  const userName = user?.first_name || 'there';
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Welcome back, Student</Text>
+          <Text style={styles.greeting}>Welcome back, {userName}</Text>
           <Text style={styles.subGreeting}>Here's your financial pulse.</Text>
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('Opportunities')}>
-          <Text style={styles.viewAllLink}>View all opportunities →</Text>
-        </TouchableOpacity>
       </View>
-
-      {/* Featured Promo Card */}
-      <TouchableOpacity
-        style={[styles.promoCard, { backgroundColor: featuredPromos[activePromo].color }]}
-        activeOpacity={0.9}
-      >
-        <View style={styles.promoContent}>
-          <Text style={styles.promoLabel}>Featured Opportunity</Text>
-          <Text style={styles.promoDiscount}>{featuredPromos[activePromo].discount}</Text>
-          <Text style={styles.promoDescription}>
-            at {featuredPromos[activePromo].provider} - {featuredPromos[activePromo].title}
-          </Text>
-          <TouchableOpacity style={styles.claimButton}>
-            <Text style={styles.claimButtonText}>Claim Now</Text>
-          </TouchableOpacity>
-        </View>
-        
-        {/* Promo Indicators */}
-        <View style={styles.indicators}>
-          {featuredPromos.map((_, idx) => (
-            <TouchableOpacity
-              key={idx}
-              onPress={() => setActivePromo(idx)}
-              style={[
-                styles.indicator,
-                idx === activePromo && styles.indicatorActive
-              ]}
-            />
-          ))}
-        </View>
-      </TouchableOpacity>
 
       {/* Financial Overview */}
       <Text style={styles.sectionTitle}>Financial Overview</Text>
@@ -103,10 +81,6 @@ const DashboardScreen = ({ navigation }) => {
               <Ionicons name="wallet" size={20} color={colors.primary} />
             </View>
           </View>
-          <View style={styles.cardFooter}>
-            <Ionicons name="trending-up" size={14} color={colors.success} />
-            <Text style={styles.changeText}>+12% vs last month</Text>
-          </View>
         </View>
 
         {/* Savings Card */}
@@ -120,39 +94,45 @@ const DashboardScreen = ({ navigation }) => {
               <Ionicons name="arrow-up" size={20} color={colors.secondary} />
             </View>
           </View>
-          <View style={styles.progressContainer}>
-            <View style={styles.progressHeader}>
-              <Text style={styles.progressLabel}>Goal Progress</Text>
-              <Text style={styles.progressValue}>65%</Text>
+          {savingsGoals.length > 0 && (
+            <View style={styles.progressContainer}>
+              <View style={styles.progressHeader}>
+                <Text style={styles.progressLabel}>Goal Progress</Text>
+                <Text style={styles.progressValue}>{savingsProgress}%</Text>
+              </View>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${Math.min(savingsProgress, 100)}%`, backgroundColor: colors.secondary }]} />
+              </View>
             </View>
-            <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: '65%', backgroundColor: colors.secondary }]} />
-            </View>
-          </View>
+          )}
         </View>
 
         {/* Monthly Allowance Card */}
-        <View style={styles.overviewCard}>
-          <View style={styles.cardHeader}>
-            <View>
-              <Text style={styles.cardLabel}>Monthly Allowance</Text>
-              <Text style={styles.cardValue}>${monthlyAllowance.toFixed(2)}</Text>
+        {monthlyAllowance > 0 && (
+          <View style={styles.overviewCard}>
+            <View style={styles.cardHeader}>
+              <View>
+                <Text style={styles.cardLabel}>Monthly Allowance</Text>
+                <Text style={styles.cardValue}>${monthlyAllowance.toFixed(2)}</Text>
+              </View>
+              <View style={[styles.cardIcon, { backgroundColor: '#ffe4e6' }]}>
+                <Ionicons name="calendar" size={20} color={colors.error} />
+              </View>
             </View>
-            <View style={[styles.cardIcon, { backgroundColor: '#ffe4e6' }]}>
-              <Ionicons name="arrow-down" size={20} color={colors.error} />
+            <View style={styles.allowanceFooter}>
+              <View style={styles.allowanceItem}>
+                <Text style={styles.allowanceLabel}>Spent</Text>
+                <Text style={styles.allowanceValue}>${totalSpentThisMonth.toFixed(2)}</Text>
+              </View>
+              <View style={[styles.allowanceItem, styles.allowanceDivider]}>
+                <Text style={styles.allowanceLabel}>Remaining</Text>
+                <Text style={[styles.allowanceValue, { color: remainingAllowance >= 0 ? colors.success : colors.error }]}>
+                  ${remainingAllowance.toFixed(2)}
+                </Text>
+              </View>
             </View>
           </View>
-          <View style={styles.allowanceFooter}>
-            <View style={styles.allowanceItem}>
-              <Text style={styles.allowanceLabel}>Spent</Text>
-              <Text style={styles.allowanceValue}>$1,340</Text>
-            </View>
-            <View style={[styles.allowanceItem, styles.allowanceDivider]}>
-              <Text style={styles.allowanceLabel}>Remaining</Text>
-              <Text style={[styles.allowanceValue, { color: colors.success }]}>$1,660</Text>
-            </View>
-          </View>
-        </View>
+        )}
       </View>
 
       {/* Recent Transactions */}
@@ -164,31 +144,60 @@ const DashboardScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.transactionsCard}>
-          {transactions.slice(0, 5).map((item, index) => (
-            <View key={item.id}>
-              {renderTransaction({ item })}
-              {index < transactions.slice(0, 5).length - 1 && <View style={styles.divider} />}
-            </View>
-          ))}
-        </View>
+        {transactions.length > 0 ? (
+          <View style={styles.transactionsCard}>
+            {transactions.slice(0, 5).map((item, index) => (
+              <View key={item.id}>
+                {renderTransaction({ item })}
+                {index < transactions.slice(0, 5).length - 1 && <View style={styles.divider} />}
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.emptyCard}>
+            <Ionicons name="receipt-outline" size={48} color={colors.textLight} />
+            <Text style={styles.emptyText}>No transactions yet</Text>
+            <Text style={styles.emptySubtext}>Add your first transaction to get started</Text>
+            <TouchableOpacity 
+              style={styles.emptyButton}
+              onPress={() => navigation.navigate('Planning')}
+            >
+              <Text style={styles.emptyButtonText}>Add Transaction</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
-      {/* Daily Insight */}
-      <View style={styles.insightCard}>
-        <View style={styles.insightHeader}>
-          <Ionicons name="sparkles" size={18} color="#facc15" />
-          <Text style={styles.insightTitle}>Daily Insight</Text>
-        </View>
-        <Text style={styles.insightText}>
-          "Spending on coffee has increased by 15%. Consider the Campus Cafe discount (Buy 1 Get 1)!"
-        </Text>
-        <View style={styles.insightButtons}>
-          <TouchableOpacity style={styles.insightButtonPrimary}>
-            <Text style={styles.insightButtonPrimaryText}>View Tip</Text>
+      {/* Quick Actions */}
+      <View style={styles.quickActions}>
+        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <View style={styles.actionsRow}>
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('Planning')}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: '#dbeafe' }]}>
+              <Ionicons name="add-circle" size={24} color={colors.primary} />
+            </View>
+            <Text style={styles.actionText}>Add Transaction</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.insightButtonSecondary}>
-            <Text style={styles.insightButtonSecondaryText}>Dismiss</Text>
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('Savings')}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: '#cffafe' }]}>
+              <Ionicons name="flag" size={24} color={colors.secondary} />
+            </View>
+            <Text style={styles.actionText}>Set Savings Goal</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('AI Advisor')}
+          >
+            <View style={[styles.actionIcon, { backgroundColor: '#f3e8ff' }]}>
+              <Ionicons name="sparkles" size={24} color="#7c3aed" />
+            </View>
+            <Text style={styles.actionText}>Ask AI Advisor</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -220,69 +229,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textMuted,
     marginTop: 4,
-  },
-  viewAllLink: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  promoCard: {
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 24,
-    height: 200,
-    justifyContent: 'space-between',
-  },
-  promoContent: {
-    flex: 1,
-  },
-  promoLabel: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
-    alignSelf: 'flex-start',
-    marginBottom: 12,
-  },
-  promoDiscount: {
-    fontSize: 40,
-    fontWeight: '900',
-    color: 'white',
-    marginBottom: 4,
-  },
-  promoDescription: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
-    marginBottom: 16,
-  },
-  claimButton: {
-    backgroundColor: 'white',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  claimButtonText: {
-    color: colors.textMain,
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  indicators: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.4)',
-  },
-  indicatorActive: {
-    width: 24,
-    backgroundColor: 'white',
   },
   sectionTitle: {
     fontSize: 18,
@@ -321,16 +267,6 @@ const styles = StyleSheet.create({
   cardIcon: {
     padding: 8,
     borderRadius: 8,
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  changeText: {
-    fontSize: 13,
-    color: colors.success,
-    fontWeight: '500',
   },
   progressContainer: {
     marginTop: 4,
@@ -441,56 +377,67 @@ const styles = StyleSheet.create({
     backgroundColor: colors.borderLight,
     marginHorizontal: 16,
   },
-  insightCard: {
-    backgroundColor: colors.bgDark,
+  emptyCard: {
+    backgroundColor: colors.white,
     borderRadius: 16,
-    padding: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 32,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textMain,
+    marginTop: 16,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: colors.textMuted,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  emptyButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginTop: 20,
+  },
+  emptyButtonText: {
+    color: colors.white,
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  quickActions: {
     marginBottom: 24,
   },
-  insightHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-  },
-  insightTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.white,
-  },
-  insightText: {
-    fontSize: 14,
-    color: '#cbd5e1',
-    lineHeight: 22,
-    marginBottom: 16,
-  },
-  insightButtons: {
+  actionsRow: {
     flexDirection: 'row',
     gap: 12,
   },
-  insightButtonPrimary: {
+  actionCard: {
     flex: 1,
-    backgroundColor: colors.primary,
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 16,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  insightButtonPrimaryText: {
-    color: colors.white,
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  insightButtonSecondary: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#334155',
+  actionIcon: {
+    width: 48,
+    height: 48,
     borderRadius: 12,
+    justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 8,
   },
-  insightButtonSecondaryText: {
-    color: colors.white,
-    fontWeight: '600',
-    fontSize: 14,
+  actionText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.textMain,
+    textAlign: 'center',
   },
 });
 

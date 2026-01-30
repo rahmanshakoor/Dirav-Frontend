@@ -9,6 +9,7 @@ import {
     Platform,
     ActivityIndicator,
     Alert,
+    Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -52,10 +53,16 @@ const LoginScreen = ({ navigation }) => {
             >
                 <View style={styles.content}>
                     <View style={styles.header}>
-                        <View style={styles.logoContainer}>
-                            <Ionicons name="wallet" size={40} color={colors.white} />
-                        </View>
-                        <Text style={styles.appName}>Dirav</Text>
+                        <Image
+                            source={require('../../../assets/brand-icon.png')}
+                            style={styles.logoImage}
+                            resizeMode="contain"
+                        />
+                        <Image
+                            source={require('../../../assets/brand-logotype.png')}
+                            style={styles.logotypeImage}
+                            resizeMode="contain"
+                        />
                         <Text style={styles.tagline}>Smart Finance for Students</Text>
                     </View>
 
@@ -141,24 +148,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 48,
     },
-    logoContainer: {
+    logoImage: {
         width: 80,
         height: 80,
-        borderRadius: 24,
-        backgroundColor: colors.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
         marginBottom: 16,
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
-        elevation: 10,
     },
-    appName: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: colors.textMain,
+    logotypeImage: {
+        width: 120,
+        height: 40,
         marginBottom: 8,
     },
     tagline: {
