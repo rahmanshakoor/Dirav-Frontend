@@ -7,6 +7,8 @@ import (
 	"dirav-backend/internal/api/routes"
 	"dirav-backend/internal/config"
 	"dirav-backend/internal/database"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +21,10 @@ func main() {
 	}
 
 	r := gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
+	r.Use(cors.New(config))
 	h := &handlers.Handler{DB: db, JWTSecret: cfg.JWTSecret}
 
 	routes.Register(r, h)
